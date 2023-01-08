@@ -1,0 +1,5 @@
+link code :https://codesandbox.io/s/upbeat-margulis-6xekm1?file=/src/todoSlice.js:0-1126
+
+npm i react-redux, redux, redux-toolkit, uuid
+
+https://viblo.asia/p/react-cung-tim-hieu-ve-redux-toolkit-mot-phien-ban-moi-cua-redux-XL6lA6yg5ek
