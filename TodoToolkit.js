@@ -4,16 +4,23 @@ import {
     setTodo,
     deleteTodo,
     toggleTodo,
-    editTodo
+    editTodo,
+    getAllTodo,
+    renderTodo
 } from "./todoSlice";
 import { v4 as uuidv4 } from "uuid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getDataFetch, getTodoFetchApi } from "./handle";
 const todoToolkit = () => {
     const state = useSelector((state) => state.todo);
     const dispatch = useDispatch();
-    const { list, todo } = state;
+    const { list, todo, pending } = state;
     const [checked, setChecked] = useState(false);
     const [id, setId] = useState("");
+    useEffect(() => {
+        // dispatch(getDataFetch(null)); // day la lay theo kieu creator
+        dispatch(getTodoFetchApi()); // day la lay kieu thunk
+    }, []);
     const handeSetTodo = (e) => {
         dispatch(setTodo(e.target.value));
     };
@@ -23,7 +30,7 @@ const todoToolkit = () => {
             setChecked(false);
             dispatch(setTodo(""));
         } else {
-            dispatch(addTodo({ id: uuidv4(), name: todo, completed: false }));
+            dispatch(addTodo({ id: uuidv4(), title: todo, completed: false }));
             dispatch(setTodo(""));
         }
     };
@@ -36,29 +43,37 @@ const todoToolkit = () => {
     const handleEdit = (id) => {
         setChecked(true);
         const item = list.find((item) => item.id === id);
-        dispatch(setTodo(item.name));
+        dispatch(setTodo(item.title));
         setId(id);
     };
+    if (pending) {
+        setTimeout(() => {
+            dispatch(renderTodo());
+        }, 2000);
+    }
     return (
         <>
             <h1>TodoList</h1>
             <input value={todo} onChange={handeSetTodo} />
             <button onClick={handleAdd}>ADD</button>
-            {list.map((item) => {
-                return (
-                    <div key={item.id}>
-                        <li
-                            onClick={() => handleToggle(item.id)}
-                            className={item.completed ? "active" : ""}
-                        >
-                            {" "}
-                            {item.name}
-                        </li>
-                        <button onClick={() => handleDelete(item.id)}>Delete </button>
-                        <button onClick={() => handleEdit(item.id)}> Edit </button>
-                    </div>
-                );
-            })}
+            {pending ? (
+                <h1>Peding...</h1>
+            ) : (
+                list.map((item) => {
+                    return (
+                        <div key={item.id}>
+                            <li
+                                onClick={() => handleToggle(item.id)}
+                                className={item.completed ? "active" : ""}
+                            >
+                                {item.title}
+                            </li>
+                            <button onClick={() => handleDelete(item.id)}>Delete </button>
+                            <button onClick={() => handleEdit(item.id)}> Edit </button>
+                        </div>
+                    );
+                })
+            )}
         </>
     );
 };
